@@ -1,16 +1,16 @@
 # The dedicated desktop launcher has only the game action and Exit. The full UI remains in ui.txt for tests.
 [scene]Menu {
-    [list]Entries {
-        attr = callback
-        max_rows = 2
-        android.row_height = 48px
-        [button]"Play Super Meat Boy" {
-            icon = gamepad-2
-        }
-        [button]"Exit" {
-            icon = log-out
-        }
-    }
+	[list]Entries {
+		attr = callback
+		max_rows = 2
+		android.row_height = 48px
+		[button]"Play Super Meat Boy" {
+			icon = gamepad-2
+		}
+		[button]"Exit" {
+			icon = log-out
+		}
+	}
 }
 [scene]Games {
 	# Recent Games over the recent rows, then a page of the games, as many as fit, each group under its heading (P, the

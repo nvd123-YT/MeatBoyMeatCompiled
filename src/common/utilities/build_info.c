@@ -7,10 +7,11 @@
 #ifndef SNX_PRODUCT_NAME
 #define SNX_PRODUCT_NAME "ScarletNX"
 #endif
-#ifndef SNX_PRODUCT_VERSION
-#define SNX_PRODUCT_VERSION ""
-#endif
+#ifdef SNX_PRODUCT_VERSION
 #define SNX_PRODUCT_TITLE SNX_PRODUCT_NAME " " SNX_PRODUCT_VERSION
+#else
+#define SNX_PRODUCT_TITLE SNX_PRODUCT_NAME
+#endif
 
 #define SNX_TEXT(x)   #x
 #define SNX_NUMBER(x) SNX_TEXT(x)

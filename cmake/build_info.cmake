@@ -22,6 +22,10 @@ if(SNX_GAME_SUPER_MEAT_BOY)
     target_compile_definitions(snx_build_info_meatboy PRIVATE "SNX_PRODUCT_NAME=\"Super Meat Boy Recompiled\"" "SNX_PRODUCT_VERSION=\"${PROJECT_VERSION}\"")
     set_target_properties(snx_build_info_meatboy PROPERTIES C_STANDARD 99 C_STANDARD_REQUIRED ON C_EXTENSIONS OFF)
     target_compile_options(snx_build_info_meatboy PRIVATE -pedantic-errors -Wall -Wextra -Werror=missing-prototypes)
+    # Keep the generic build-info target in the dependency graph too: source ownership checks
+    # require every build_info.h consumer to link it. The branded archive resolves the symbols
+    # first; the generic archive is only the shared contract dependency.
+    target_link_libraries(snx_build_info_meatboy PUBLIC snx_build_info)
     set(snx_gui_build_info_target snx_build_info_meatboy)
 endif()
 set_target_properties(snx_build_info PROPERTIES C_STANDARD 99 C_STANDARD_REQUIRED ON C_EXTENSIONS OFF)

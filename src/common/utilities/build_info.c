@@ -4,6 +4,14 @@
 #include "snx_commit.h"
 #include <stdio.h>
 
+#ifndef SNX_PRODUCT_NAME
+#define SNX_PRODUCT_NAME "ScarletNX"
+#endif
+#ifndef SNX_PRODUCT_VERSION
+#define SNX_PRODUCT_VERSION ""
+#endif
+#define SNX_PRODUCT_TITLE SNX_PRODUCT_NAME " " SNX_PRODUCT_VERSION
+
 #define SNX_TEXT(x)   #x
 #define SNX_NUMBER(x) SNX_TEXT(x)
 #if defined(__clang__)
@@ -55,10 +63,10 @@
 #endif
 
 const char* snx_build_info(void) {
-    return "ScarletNX " SNX_BRANCH " " SNX_COMMIT " (" SNX_COMPILER ", " SNX_OS " " SNX_ARCH ")";
+    return SNX_PRODUCT_TITLE " " SNX_BRANCH " " SNX_COMMIT " (" SNX_COMPILER ", " SNX_OS " " SNX_ARCH ")";
 }
 const char* snx_build_log_line(void) {
-    return "ScarletNX " SNX_BRANCH " " SNX_COMMIT ", committed " SNX_COMMIT_DATE " (" SNX_COMPILER ", " SNX_OS
+    return SNX_PRODUCT_TITLE " " SNX_BRANCH " " SNX_COMMIT ", committed " SNX_COMMIT_DATE " (" SNX_COMPILER ", " SNX_OS
            " " SNX_ARCH ")";
 }
 const char* snx_build_commit(void) { return SNX_COMMIT; }

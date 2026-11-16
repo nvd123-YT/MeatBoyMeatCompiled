@@ -21,7 +21,7 @@ endif()
 if(NOT DEFINED CMAKE_CXX_COMPILER AND NOT DEFINED ENV{CXX})
     set(CMAKE_CXX_COMPILER clang++)
 endif()
-project(ScarletNX LANGUAGES C CXX)
+project(ScarletNX VERSION 1.0.0 LANGUAGES C CXX)
 # Xcode's Clang names itself AppleClang: the same compiler, with Apple's version numbers
 if(NOT CMAKE_C_COMPILER_ID MATCHES "^(Apple)?Clang$" OR NOT CMAKE_CXX_COMPILER_ID MATCHES "^(Apple)?Clang$")
     message(FATAL_ERROR "ScarletNX builds with Clang only, and this is ${CMAKE_C_COMPILER_ID} "
@@ -60,11 +60,11 @@ set(CMAKE_CXX_EXTENSIONS ON)
 # and without extensions (C_STANDARD 99, C_EXTENSIONS OFF on those targets)
 
 option(SNX_BUILD_NX "Build the Switch Horizon/Maxwell runtime" ON)
-option(SNX_BUILD_GNUABI "Build the CPU-only Linux AArch64 runtime" ON)
-option(SNX_BUILD_3DS "Build the 3DS driver: extraction, the ARM11 AOT compiler and the runtime" ON)
-option(SNX_BUILD_VITA "Build the PS Vita driver: VPK extraction, the AArch32 AOT compiler and the runtime" ON)
-option(SNX_BUILD_AGB "Build the Game Boy Advance AGB board runtime" ON)
-option(SNX_BUILD_NDS "Build the DS driver: the ARM9 AOT compiler, the board and its Vulkan renderer" ON)
+option(SNX_BUILD_GNUABI "Build the CPU-only Linux AArch64 runtime" OFF)
+option(SNX_BUILD_3DS "Build the 3DS driver: extraction, the ARM11 AOT compiler and the runtime" OFF)
+option(SNX_BUILD_VITA "Build the PS Vita driver: VPK extraction, the AArch32 AOT compiler and the runtime" OFF)
+option(SNX_BUILD_AGB "Build the Game Boy Advance AGB board runtime" OFF)
+option(SNX_BUILD_NDS "Build the DS driver: the ARM9 AOT compiler, the board and its Vulkan renderer" OFF)
 # the Android app driver runs apps on a desktop's JVM: not in ScarletNX's own Android and iOS apps, which have none.
 # Its native bridge passes the guest's registers as an x86-64 or AArch64 host's (bridge/hle_libc.c)
 # By default only where a JDK 21 or later with include/jni.h is found (cmake/android_jdk.cmake); asked for with none,
@@ -82,8 +82,7 @@ else()
         set(snx_android_default OFF)
     endif()
 endif()
-option(SNX_BUILD_ANDROID "Build the Android app driver: the DEX translator and the HLE of Android's userland"
-       ${snx_android_default})
+option(SNX_BUILD_ANDROID "Build the Android app driver: the DEX translator and the HLE of Android's userland" OFF)
 if(NOT SNX_BUILD_ANDROID AND snx_android_jdk_why)
     message(STATUS "The Android app driver is off: ${snx_android_jdk_why}. Set SNX_BUILD_ANDROID=ON with a JDK 21 or "
                    "later to build it")
@@ -133,7 +132,7 @@ if(SNX_BUILD_NX AND NOT SNX_TOOLS_ONLY)
     set(snx_gui_default ON)
 endif()
 option(SNX_BUILD_GUI "Build the keyboard-driven SDL3 launcher" ${snx_gui_default})
-option(SNX_GAME_SUPER_MEAT_BOY "Build the Super Meat Boy-specific launcher" OFF)
+option(SNX_GAME_SUPER_MEAT_BOY "Build the Super Meat Boy-specific launcher" ON)
 # The program, scarletnx, is every driver the build has (src/multicall): each driver is a library, and the program
 # runs the one its name says. scarletnx-switch, scarletnx-3ds, scarletnx-vita, scarletnx-gnuabi, scarletnx-agb and scarletnx-nds are
 # links to it on Linux and macOS

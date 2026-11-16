@@ -1,6 +1,6 @@
 # Super Meat Boy Recompiled
 
-A dedicated desktop build of [ScarletNX](https://github.com/scarletnx/ScarletNX), configured for the Nintendo Switch version of **Super Meat Boy**.
+A dedicated desktop build of [ScarletNX](https://github.com/scarletnx/ScarletNX), configured for the Switch version of **Super Meat Boy**.
 
 This fork keeps ScarletNX's Switch recompilation engine and runtime while tailoring the desktop launcher to this game. The launcher focuses on loading the Super Meat Boy game dump, compiling it for the current computer, and starting it. Unrelated console loaders and the general-purpose first-run setup are excluded from the desktop build.
 

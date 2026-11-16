@@ -926,7 +926,7 @@ static char* game_ini_of(const char* program);
 #ifdef SNX_MEATBOY
 #define GUI_MENU_COUNT 2
 #define GUI_ENTRY(item) (UI_MENU_ENTRIES_PLAY_SUPER_MEAT_BOY + ((item) == GUI_EXIT ? 1 : 0))
-typedef char gui_entries_in_order[GUI_ENTRY(GUI_EXIT) == UI_MENU_ENTRIES_EXIT && GUI_MENU_COUNT == UI_MENU_ITEMS ? 1 : -1];
+typedef char gui_entries_in_order[GUI_ENTRY(GUI_EXIT) == UI_MENU_ENTRIES_EXIT && GUI_MENU_COUNT + 1 == UI_MENU_ITEMS ? 1 : -1];
 #else
 #define GUI_MENU_COUNT GUI_ITEM_COUNT
 #define GUI_ENTRY(item) (UI_MENU_ENTRIES_LOAD_SWITCH_NSP_XCI_NRO + (item))

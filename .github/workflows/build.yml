@@ -78,7 +78,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           latest=$(curl -fsS -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' \
-            "$GITHUB_API_URL/repos/scarletnx/nightly/releases/latest" | python3 -c 'import json, sys; print(json.load(sys.stdin)["tag_name"])')
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/releases/latest" | python3 -c 'import json, sys; print(json.load(sys.stdin)["tag_name"])')
           echo "the newest nightly: $latest; this run: ${GITHUB_SHA::7}"
           case $latest in
           *-"${GITHUB_SHA::7}")

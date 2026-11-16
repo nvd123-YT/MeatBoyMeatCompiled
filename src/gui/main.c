@@ -928,6 +928,7 @@ static char* game_ini_of(const char* program);
 #define GUI_ENTRY(item) (UI_MENU_ENTRIES_PLAY_SUPER_MEAT_BOY + ((item) == GUI_EXIT ? 1 : 0))
 typedef char gui_entries_in_order[GUI_ENTRY(GUI_EXIT) == UI_MENU_ENTRIES_EXIT && GUI_MENU_COUNT == UI_MENU_ITEMS ? 1 : -1];
 #else
+#define GUI_MENU_COUNT GUI_ITEM_COUNT
 #define GUI_ENTRY(item) (UI_MENU_ENTRIES_LOAD_SWITCH_NSP_XCI_NRO + (item))
 typedef char gui_entries_in_order[GUI_ENTRY(GUI_LINUX) == UI_MENU_ENTRIES_LOAD_LINUX_ARM_ELF &&
                                           GUI_ENTRY(GUI_3DS) == UI_MENU_ENTRIES_LOAD_3DS_GAME &&
@@ -7019,7 +7020,11 @@ static const char* item_about(const App* app, int item) {
                                         SNX_TR_NOOP("Runs an Android app's .apk, .xapk or .apks")};
     if (item >= GUI_SWITCH && item <= GUI_ANDROID) return snx_tr(loads[item - GUI_SWITCH]);
     if (item == GUI_KEYS) return snx_tr("Installs prod.keys, which games are extracted with");
+#ifdef SNX_MEATBOY
+    if (item == GUI_EXIT) return snx_tr("Closes Super Meat Boy Recompiled");
+#else
     if (item == GUI_EXIT) return snx_tr("Closes ScarletNX");
+#endif
     {
         GuiMenu menu = app->menu;
         menu.selected = item;

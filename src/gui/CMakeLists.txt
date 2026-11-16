@@ -163,7 +163,7 @@ set_target_properties(scarletnx-gui PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED
 target_compile_options(scarletnx-gui PRIVATE -Wall -Wextra -Werror=missing-prototypes)
 target_compile_definitions(scarletnx-gui PRIVATE SNX_SOURCE_DIR="${PROJECT_SOURCE_DIR}" SNX_BUILD_DIR="${PROJECT_BINARY_DIR}")
 target_link_libraries(scarletnx-gui PUBLIC snx_gui_support PRIVATE ${snx_gui_ui_target} scarletnx-common SDL3::SDL3
-                      snx_window_icon snx_build_info snx_pad_sdl snx_gui_pad snx_splash snx_gui_languages snx_demangle)
+                      snx_window_icon ${snx_gui_build_info_target} snx_pad_sdl snx_gui_pad snx_splash snx_gui_languages snx_demangle)
 # GPU Drivers' Download Driver, where the build has OpenSSL (common/network/https.h)
 if(TARGET snx_https)
     target_link_libraries(scarletnx-gui PRIVATE snx_https)

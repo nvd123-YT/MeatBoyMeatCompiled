@@ -9,11 +9,20 @@ add_custom_target(snx_commit
     COMMAND "${CMAKE_COMMAND}" "-DSRC=${PROJECT_SOURCE_DIR}" "-DOUT=${snx_commit_header}"
             -P "${PROJECT_SOURCE_DIR}/cmake/commit.cmake"
     BYPRODUCTS "${snx_commit_header}" VERBATIM)
+# The shared ScarletNX build-info target remains generic for the project's test programs.
 add_library(snx_build_info STATIC "${PROJECT_SOURCE_DIR}/src/common/utilities/build_info.c")
 add_dependencies(snx_build_info snx_commit)
 target_include_directories(snx_build_info PRIVATE "${PROJECT_BINARY_DIR}/generated")
+set(snx_gui_build_info_target snx_build_info)
 if(SNX_GAME_SUPER_MEAT_BOY)
-    target_compile_definitions(snx_build_info PRIVATE "SNX_PRODUCT_NAME=\"Super Meat Boy Recompiled\"" "SNX_PRODUCT_VERSION=\"${PROJECT_VERSION}\"")
+    # A separate product-branded copy is linked only into the shipped game launcher/runtime.
+    add_library(snx_build_info_meatboy STATIC "${PROJECT_SOURCE_DIR}/src/common/utilities/build_info.c")
+    add_dependencies(snx_build_info_meatboy snx_commit)
+    target_include_directories(snx_build_info_meatboy PRIVATE "${PROJECT_BINARY_DIR}/generated")
+    target_compile_definitions(snx_build_info_meatboy PRIVATE "SNX_PRODUCT_NAME=\"Super Meat Boy Recompiled\"" "SNX_PRODUCT_VERSION=\"${PROJECT_VERSION}\"")
+    set_target_properties(snx_build_info_meatboy PROPERTIES C_STANDARD 99 C_STANDARD_REQUIRED ON C_EXTENSIONS OFF)
+    target_compile_options(snx_build_info_meatboy PRIVATE -pedantic-errors -Wall -Wextra -Werror=missing-prototypes)
+    set(snx_gui_build_info_target snx_build_info_meatboy)
 endif()
 set_target_properties(snx_build_info PROPERTIES C_STANDARD 99 C_STANDARD_REQUIRED ON C_EXTENSIONS OFF)
 target_compile_options(snx_build_info PRIVATE -pedantic-errors -Wall -Wextra -Werror=missing-prototypes)

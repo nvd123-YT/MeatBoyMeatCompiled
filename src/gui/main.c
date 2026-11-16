@@ -7021,7 +7021,7 @@ static const char* item_about(const App* app, int item) {
     if (item >= GUI_SWITCH && item <= GUI_ANDROID) return snx_tr(loads[item - GUI_SWITCH]);
     if (item == GUI_KEYS) return snx_tr("Installs prod.keys, which games are extracted with");
 #ifdef SNX_MEATBOY
-    if (item == GUI_EXIT) return snx_tr("Closes Super Meat Boy Recompiled");
+    if (item == GUI_EXIT) return "Closes Super Meat Boy Recompiled";
 #else
     if (item == GUI_EXIT) return snx_tr("Closes ScarletNX");
 #endif

@@ -924,7 +924,8 @@ static char* game_ini_of(const char* program);
 /* the menu's item i: a row of ui.txt's Entries, in model.h's order (a negative size if not); its text shown
    translated */
 #ifdef SNX_MEATBOY
-#define GUI_ENTRY(item) (UI_MENU_ENTRIES_LOAD_SWITCH_NSP_XCI_NRO + ((item) == GUI_EXIT ? 1 : 0))
+#define GUI_MENU_COUNT 2
+#define GUI_ENTRY(item) (UI_MENU_ENTRIES_PLAY_SUPER_MEAT_BOY + ((item) == GUI_EXIT ? 1 : 0))
 typedef char gui_entries_in_order[GUI_ENTRY(GUI_EXIT) == UI_MENU_ENTRIES_EXIT && GUI_MENU_COUNT == UI_MENU_ITEMS ? 1 : -1];
 #else
 #define GUI_ENTRY(item) (UI_MENU_ENTRIES_LOAD_SWITCH_NSP_XCI_NRO + (item))
@@ -20005,6 +20006,13 @@ static void menu_key(App* app, GuiKey key) {
         return;
     }
     if (pick_screen(app) && key != GUI_SELECT && key != GUI_CANCEL) return; /* nothing there to move to */
+#ifdef SNX_MEATBOY
+    if (before == GUI_LOAD_NONE && !app->menu.running &&
+        (key == GUI_UP || key == GUI_DOWN || key == GUI_LEFT || key == GUI_RIGHT)) {
+        app->menu.selected = app->menu.selected == GUI_EXIT ? GUI_SWITCH : GUI_EXIT;
+        return;
+    }
+#endif
     /* a load whose driver is not there opens no screen: it says which driver, looked for again now (#640) */
     if (key == GUI_SELECT && app->menu.view == GUI_LOAD_NONE && !app->menu.running &&
         app->menu.selected <= GUI_ANDROID) {
@@ -20265,6 +20273,9 @@ static void menu_entry(App* app, int item, uint32_t hit) {
     app->menu.selected = item;
     if (hit & UI_HIT_CLICK) menu_key(app, GUI_SELECT);
 }
+#ifdef SNX_MEATBOY
+void ui_menu_entries_play_super_meat_boy_action_cb(App* app, uint32_t hit) { menu_entry(app, GUI_SWITCH, hit); }
+#else
 void ui_menu_entries_load_switch_nsp_xci_nro_action_cb(App* app, uint32_t hit) { menu_entry(app, GUI_SWITCH, hit); }
 #ifndef SNX_MEATBOY
 void ui_menu_entries_load_linux_arm_elf_action_cb(App* app, uint32_t hit) { menu_entry(app, GUI_LINUX, hit); }
@@ -20277,6 +20288,7 @@ void ui_menu_entries_install_keys_action_cb(App* app, uint32_t hit) { menu_entry
 void ui_menu_entries_settings_action_cb(App* app, uint32_t hit) { menu_entry(app, GUI_SETTINGS, hit); }
 void ui_menu_entries_share_log_action_cb(App* app, uint32_t hit) { menu_entry(app, GUI_LOG, hit); }
 void ui_menu_entries_folders_action_cb(App* app, uint32_t hit) { menu_entry(app, GUI_FOLDERS, hit); }
+#endif
 #endif
 void ui_menu_entries_exit_action_cb(App* app, uint32_t hit) { menu_entry(app, GUI_EXIT, hit); }
 /* the keys the foot names, a word each ("Up/Down" is two): what a click or a tap on the word presses. Space selects

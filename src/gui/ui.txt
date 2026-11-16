@@ -9,47 +9,37 @@
 		# a finger's (main.c's GUI_FINGER_ROW): 96 pixels at a phone's default 2x, about 37dp at a density of 2.6; 144 at
 		# 3x, Android's 48dp touch target (#589)
 		android.row_height = 48px
-		[button]"Play Super Meat Boy" {
+		[button]"Load Switch NSP/XCI/NRO" {
 			icon = gamepad-2
 		}
 		[button]"Load Linux ARM ELF" {
-			for-platform = android
 			icon = square-terminal
 		}
 		[button]"Load 3DS game" {
-			for-platform = android
 			icon = box
 		}
 		[button]"Load Vita VPK" {
-			for-platform = android
 			icon = package
 		}
 		[button]"Load GBA/MultiBoot ROM" {
-			for-platform = android
 			icon = gamepad
 		}
 		[button]"Load NDS ROM" {
-			for-platform = android
 			icon = gamepad
 		}
 		[button]"Load Android APK/XAPK" {
-			for-platform = android
 			icon = package-plus
 		}
 		[button]"Install Keys" {
-			for-platform = android
 			icon = key-round
 		}
 		[button]"Settings" {
-			for-platform = android
 			icon = settings
 		}
 		[button]"Share Log" {
-			for-platform = android
 			icon = share-2
 		}
 		[button]"Folders" {
-			for-platform = android
 			icon = folder-open
 		}
 		[button]"Exit" {

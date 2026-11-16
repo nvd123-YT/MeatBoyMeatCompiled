@@ -336,7 +336,8 @@
         "SNX_BUILD_AGB": "OFF",
         "SNX_BUILD_NDS": "OFF",
         "SNX_BUILD_ANDROID": "OFF",
-        "SNX_BUILD_GUI": "ON"
+        "SNX_BUILD_GUI": "ON",
+        "SNX_GAME_SUPER_MEAT_BOY": "ON"
       }
     },
     {
@@ -352,7 +353,8 @@
         "SNX_BUILD_AGB": "OFF",
         "SNX_BUILD_NDS": "OFF",
         "SNX_BUILD_ANDROID": "OFF",
-        "SNX_BUILD_GUI": "ON"
+        "SNX_BUILD_GUI": "ON",
+        "SNX_GAME_SUPER_MEAT_BOY": "ON"
       }
     }
   ],

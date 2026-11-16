@@ -24,6 +24,11 @@ enum {
     GUI_EXIT,
     GUI_ITEM_COUNT
 };
+#ifdef SNX_MEATBOY
+#define GUI_MENU_COUNT 2
+#else
+#define GUI_MENU_COUNT GUI_ITEM_COUNT
+#endif
 typedef enum { GUI_UP, GUI_DOWN, GUI_LEFT, GUI_RIGHT, GUI_SELECT, GUI_CANCEL, GUI_PAGE_UP, GUI_PAGE_DOWN } GuiKey;
 #define GUI_TEXT_MAX 4
 /* the screen over the menu: none, a load's file to pick, the games' browser, the keys', the recompiles' queue */

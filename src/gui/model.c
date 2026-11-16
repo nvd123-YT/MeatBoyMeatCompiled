@@ -16,7 +16,9 @@
 #include <string.h>
 
 /* the item before or after one, round the menu */
+#ifndef SNX_MEATBOY
 static int step_item(int item, int step) { return (item + GUI_ITEM_COUNT + step) % GUI_ITEM_COUNT; }
+#endif
 GuiMenuDo gui_menu_key(GuiMenu* menu, GuiKey key) {
     /* the browser owns its keys, and the queue its own */
     if (menu->running || menu->view == GUI_LOAD_GAMES || menu->view == GUI_LOAD_RECOMPILE) return GUI_MENU_STAY;
@@ -27,10 +29,17 @@ GuiMenuDo gui_menu_key(GuiMenu* menu, GuiKey key) {
     }
     if (menu->view == GUI_LOAD_KEYS) return GUI_MENU_STAY;
     switch (key) {
+#ifdef SNX_MEATBOY
+        case GUI_UP:
+        case GUI_LEFT:
+        case GUI_DOWN:
+        case GUI_RIGHT: menu->selected = menu->selected == GUI_EXIT ? GUI_SWITCH : GUI_EXIT; break;
+#else
         case GUI_UP:
         case GUI_LEFT: menu->selected = step_item(menu->selected, -1); break;
         case GUI_DOWN:
         case GUI_RIGHT: menu->selected = step_item(menu->selected, 1); break;
+#endif
         case GUI_SELECT:
             menu->active = menu->selected;
             menu->activated = true;

@@ -923,6 +923,10 @@ static char* game_ini_of(const char* program);
 
 /* the menu's item i: a row of ui.txt's Entries, in model.h's order (a negative size if not); its text shown
    translated */
+#ifdef SNX_MEATBOY
+#define GUI_ENTRY(item) (UI_MENU_ENTRIES_LOAD_SWITCH_NSP_XCI_NRO + ((item) == GUI_EXIT ? 1 : 0))
+typedef char gui_entries_in_order[GUI_ENTRY(GUI_EXIT) == UI_MENU_ENTRIES_EXIT && GUI_MENU_COUNT == UI_MENU_ITEMS ? 1 : -1];
+#else
 #define GUI_ENTRY(item) (UI_MENU_ENTRIES_LOAD_SWITCH_NSP_XCI_NRO + (item))
 typedef char gui_entries_in_order[GUI_ENTRY(GUI_LINUX) == UI_MENU_ENTRIES_LOAD_LINUX_ARM_ELF &&
                                           GUI_ENTRY(GUI_3DS) == UI_MENU_ENTRIES_LOAD_3DS_GAME &&
@@ -938,6 +942,7 @@ typedef char gui_entries_in_order[GUI_ENTRY(GUI_LINUX) == UI_MENU_ENTRIES_LOAD_L
                                           GUI_ENTRY(GUI_ITEM_COUNT) == UI_MENU_ITEMS
                                       ? 1
                                       : -1];
+#endif
 static const char* entry_text(int item) { return ui_menu_texts + ui_menu_items[GUI_ENTRY(item)].text; }
 #define GUI_RECENT_SHOWN 3 /* the recent games Games shows before a row that shows the rest */
 /* what the screens say to press: a phone has a finger, the back button and the system's file picker, nothing to drop;
@@ -6988,6 +6993,20 @@ typedef struct {
     GuiRect rects[UI_MENU_ITEMS];
     UiList lists[UI_MENU_ITEMS]; /* the entries' at UI_MENU_ENTRIES: row i is item i */
 } GuiMenuBoxes;
+static int menu_item_from_row(size_t row) {
+#ifdef SNX_MEATBOY
+    return row == 1 ? GUI_EXIT : GUI_SWITCH;
+#else
+    return (int)row;
+#endif
+}
+static size_t menu_row_from_item(int item) {
+#ifdef SNX_MEATBOY
+    return item == GUI_EXIT ? 1u : 0u;
+#else
+    return (size_t)item;
+#endif
+}
 /* what an item is about, for the tips and the side box */
 static const char* item_about(const App* app, int item) {
     static const char* const loads[] = {SNX_TR_NOOP("Recompiles a game's .nsp, .xci or .nro, then runs it"),
@@ -7009,11 +7028,11 @@ static const char* item_about(const App* app, int item) {
 static void menu_boxes(App* app, GuiMenuBoxes* m) {
     char keys[256];
     place_screen(app, &m->place, shown_keys(app, keys, sizeof keys),
-                 GUI_SHOWS_STATUS | GUI_SHOWS_TABS | GUI_SHOWS_SIDE);
+                 GUI_SHOWS_STATUS | GUI_SHOWS_SIDE);
     ui_menu_layout(m->place.list, app->scale, m->rects);
     memset(m->lists, 0, sizeof m->lists);
-    m->lists[UI_MENU_ENTRIES].focus = (size_t)app->menu.selected;
-    list_follow(app, GUI_LIST_MENU, ui_menu_follow, ui_menu_row, m->rects, UI_MENU_ENTRIES, GUI_ITEM_COUNT,
+    m->lists[UI_MENU_ENTRIES].focus = menu_row_from_item(app->menu.selected);
+    list_follow(app, GUI_LIST_MENU, ui_menu_follow, ui_menu_row, m->rects, UI_MENU_ENTRIES, GUI_MENU_COUNT,
                 &m->lists[UI_MENU_ENTRIES]);
 }
 /* the last run's output, under what the side box says */
@@ -7032,7 +7051,7 @@ static void last_output(App* app, GuiRect r, int y) {
 /* the side box: the focused item, and for the keys the ones in use; the last run's output under it. What the item
    does is the tips', not said twice */
 static void menu_side(App* app, const GuiMenuBoxes* m) {
-    int item = (int)m->lists[UI_MENU_ENTRIES].focus, y;
+    int item = menu_item_from_row(m->lists[UI_MENU_ENTRIES].focus), y;
     GuiRect r = inner(app, m->place.side);
     char line[1100];
     if (!m->place.side.h) return;
@@ -7050,14 +7069,17 @@ static void menu_side(App* app, const GuiMenuBoxes* m) {
    keys while no prod.keys is in use, so a first start shows what to do first, and Share Log after a run crashed until
    its log is saved; greyed, a load whose driver is not there */
 unsigned ui_menu_entries_attr_cb(App* app, size_t row) {
-    unsigned attr = app->menu.activated && (size_t)app->menu.active == row ? UI_ATTR_ACTIVE : 0;
-    if (row == GUI_KEYS) {
+    int item = menu_item_from_row(row);
+    unsigned attr = app->menu.activated && app->menu.active == item ? UI_ATTR_ACTIVE : 0;
+#ifndef SNX_MEATBOY
+    if (item == GUI_KEYS) {
         char* in_use = keys_in_use(app);
         if (!in_use) attr |= UI_ATTR_FAILURE | UI_ATTR_BLINK;
         free(in_use);
     }
-    if (row == GUI_LOG && app->log_due) attr |= UI_ATTR_FAILURE | UI_ATTR_BLINK;
-    if (row <= GUI_ANDROID && (loads_off(app) >> row & 1u)) attr |= UI_ATTR_OFF;
+    if (item == GUI_LOG && app->log_due) attr |= UI_ATTR_FAILURE | UI_ATTR_BLINK;
+#endif
+    if (item <= GUI_ANDROID && (loads_off(app) >> item & 1u)) attr |= UI_ATTR_OFF;
     return attr;
 }
 static void draw_menu(App* app) {
@@ -7068,7 +7090,7 @@ static void draw_menu(App* app) {
     ui_menu_draw(app, m.rects, app->scale, m.lists);
     menu_side(app, &m);
     status_box(app, m.place.status);
-    screen_foot(app, &m.place, item_about(app, (int)m.lists[UI_MENU_ENTRIES].focus),
+    screen_foot(app, &m.place, item_about(app, menu_item_from_row(m.lists[UI_MENU_ENTRIES].focus)),
                 shown_keys(app, keys, sizeof keys));
 }
 /* ---- Games: "Recent Games" over the recent rows, then a page of the games, as many as the list's box holds ---- */
@@ -19910,12 +19932,18 @@ static void grid_key(App* app, GuiKey key) {
 /* the tab step tabs from the one shown, round them: Tab and Shift+Tab, a pad's shoulders. Tab on the Compile tab
    goes back to Games, where R was pressed, the recompile going on */
 static void screen_tab(App* app, int step) {
+#ifdef SNX_MEATBOY
+    (void)step;
+    if (app->menu.running || app->finished || app->confirm.shown || app->splash) return;
+    if (app->menu.view == GUI_LOAD_RECOMPILE) go_tab(app, GUI_TAB_MENU);
+#else
     int n = tab_count(app);
     if (app->menu.running || app->finished || app->confirm.shown || app->splash) return;
     if (step > 0 && tab_shown(app) == GUI_TAB_RECOMPILE && !app->editing && !app->setup_on)
         go_tab(app, GUI_TAB_GAMES);
     else
         go_tab(app, ((tab_shown(app) + step) % n + n) % n);
+#endif
 }
 static void menu_key(App* app, GuiKey key) {
     GuiLoadView before = app->menu.view; /* the screen this key was pressed on */
@@ -20238,6 +20266,7 @@ static void menu_entry(App* app, int item, uint32_t hit) {
     if (hit & UI_HIT_CLICK) menu_key(app, GUI_SELECT);
 }
 void ui_menu_entries_load_switch_nsp_xci_nro_action_cb(App* app, uint32_t hit) { menu_entry(app, GUI_SWITCH, hit); }
+#ifndef SNX_MEATBOY
 void ui_menu_entries_load_linux_arm_elf_action_cb(App* app, uint32_t hit) { menu_entry(app, GUI_LINUX, hit); }
 void ui_menu_entries_load_3ds_game_action_cb(App* app, uint32_t hit) { menu_entry(app, GUI_3DS, hit); }
 void ui_menu_entries_load_vita_vpk_action_cb(App* app, uint32_t hit) { menu_entry(app, GUI_VITA, hit); }
@@ -20248,6 +20277,7 @@ void ui_menu_entries_install_keys_action_cb(App* app, uint32_t hit) { menu_entry
 void ui_menu_entries_settings_action_cb(App* app, uint32_t hit) { menu_entry(app, GUI_SETTINGS, hit); }
 void ui_menu_entries_share_log_action_cb(App* app, uint32_t hit) { menu_entry(app, GUI_LOG, hit); }
 void ui_menu_entries_folders_action_cb(App* app, uint32_t hit) { menu_entry(app, GUI_FOLDERS, hit); }
+#endif
 void ui_menu_entries_exit_action_cb(App* app, uint32_t hit) { menu_entry(app, GUI_EXIT, hit); }
 /* the keys the foot names, a word each ("Up/Down" is two): what a click or a tap on the word presses. Space selects
    where the foot names it, as Enter; Add a folder's opens the folder picker, as Enter on its row. A word is found by
@@ -22002,9 +22032,11 @@ int snx_gui_main(const char* self) {
     }
     open_files(&app); /* here, not in initialize(), so the tests keep their own */
     mark_start(&app, false);
+#ifndef SNX_MEATBOY
     last_run_look(&app); /* a run whose end the last start did not see: the setup's first page, Last Run */
     left_behind(&app);   /* what an older version left: the setup's last pages, Old Files */
     setup_start(&app);
+#endif
     app.games_fresh = true;
     watch_start(&app);
     app.dump_icons.live = true; /* the dumps' icons asked on a thread of their own */

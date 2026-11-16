@@ -133,6 +133,7 @@ if(SNX_BUILD_NX AND NOT SNX_TOOLS_ONLY)
     set(snx_gui_default ON)
 endif()
 option(SNX_BUILD_GUI "Build the keyboard-driven SDL3 launcher" ${snx_gui_default})
+option(SNX_GAME_SUPER_MEAT_BOY "Build the Super Meat Boy-specific launcher" OFF)
 # The program, scarletnx, is every driver the build has (src/multicall): each driver is a library, and the program
 # runs the one its name says. scarletnx-switch, scarletnx-3ds, scarletnx-vita, scarletnx-gnuabi, scarletnx-agb and scarletnx-nds are
 # links to it on Linux and macOS

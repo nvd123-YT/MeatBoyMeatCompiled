@@ -56,6 +56,9 @@ add_library(snx_gui_support STATIC aot.c model.c browser.c steps.c theme.c recen
             ${gui_process}
             "${PROJECT_BINARY_DIR}/generated/gui_themes.c" "${PROJECT_BINARY_DIR}/generated/gui_glyphs.c"
             "${PROJECT_BINARY_DIR}/generated/gui_titles.c")
+if(SNX_GAME_SUPER_MEAT_BOY)
+    target_compile_definitions(snx_gui_support PRIVATE SNX_MEATBOY=1)
+endif()
 target_link_libraries(snx_gui_support PUBLIC scarletnx-common snx_setup snx_i18n snx_settings snx_miniz PRIVATE snx_libdeflate)
 # Install Keys' check of the DS's ARM7 BIOS, its CRC-32 (snx_crc32, main.c)
 target_link_libraries(snx_gui_support PUBLIC snx_zip)

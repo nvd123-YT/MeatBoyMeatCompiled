@@ -94,11 +94,12 @@ for program in "${drivers[@]}"; do
     # The Switch driver's shared usage banner is intentionally "scarletnx", not the alias
     # "scarletnx-switch". Its Switch options identify the driver; other aliases name themselves.
     if [ "$program" = scarletnx-switch ]; then
-        valid_help=$(grep -q '^Usage: scarletnx ' <<<"$out" && grep -q '^Switch options:' <<<"$out")
-    else
-        valid_help=$(grep -q "^Usage: $program" <<<"$out")
-    fi
-    if [ "$valid_help" != 0 ]; then
+        if ! grep -q '^Usage: scarletnx ' <<<"$out" || ! grep -q '^Switch options:' <<<"$out"; then
+            echo "The AppDir's bin/$program --help does not identify the Switch driver. It printed:" >&2
+            echo "$out" >&2
+            exit 1
+        fi
+    elif ! grep -q "^Usage: $program" <<<"$out"; then
         echo "The AppDir's bin/$program --help does not identify the expected driver. It printed:" >&2
         echo "$out" >&2
         exit 1

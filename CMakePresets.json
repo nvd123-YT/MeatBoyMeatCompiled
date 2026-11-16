@@ -429,11 +429,13 @@
     },
     {
       "name": "meatboy",
-      "configurePreset": "meatboy"
+      "configurePreset": "meatboy",
+      "displayName": "Build Super Meat Boy (Switch runtime)"
     },
     {
       "name": "meatboy-macos",
-      "configurePreset": "meatboy-macos"
+      "configurePreset": "meatboy-macos",
+      "displayName": "Build Super Meat Boy (macOS)"
     }
   ],
   "testPresets": [

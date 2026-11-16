@@ -62,11 +62,10 @@ if ! grep -qF -- '--migrate takes nothing after it: extra' <<<"$out"; then
     echo "$out" >&2
     exit 1
 fi
-# and it needs everything it runs beside it
-for program in scarletnx-3ds scarletnx-vita scarletnx-agb scarletnx-nds scarletnx-gnuabi; do
-    if [ ! -e "$APPDIR/bin/$program" ]; then
-        echo "The AppImage has no bin/$program, which the launcher runs" >&2
-        exit 1
-    fi
-done
+# This fork builds only the Switch driver; the launcher must have that alias, but must not
+# require the unrelated 3DS, Vita, GBA, DS or GNU ABI drivers disabled by its build profile.
+if [ ! -e "$APPDIR/bin/scarletnx-switch" ]; then
+    echo "The AppImage has no bin/scarletnx-switch, which the launcher runs" >&2
+    exit 1
+fi
 echo "AppImage checked: it looks for its game module next to itself or where --game says, and has the launcher"

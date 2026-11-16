@@ -51,6 +51,23 @@ target_include_directories(snx_gui_ui PUBLIC "${PROJECT_BINARY_DIR}/generated")
 target_link_libraries(snx_gui_ui PRIVATE SDL3::SDL3) # its platform macros and keycodes
 set_target_properties(snx_gui_ui PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED ON)
 target_compile_options(snx_gui_ui PRIVATE -Wall -Wextra -Werror=missing-prototypes)
+
+# Keep the full ScarletNX UI for tests; the shipped desktop app gets its own two-action menu.
+set(snx_gui_ui_target snx_gui_ui)
+if(SNX_GAME_SUPER_MEAT_BOY AND NOT ANDROID AND NOT IOS)
+    set(snx_meatboy_ui_dir "${PROJECT_BINARY_DIR}/generated_meatboy")
+    add_custom_command(OUTPUT "${snx_meatboy_ui_dir}/gui/ui.h" "${snx_meatboy_ui_dir}/gui/ui.c"
+        COMMAND "${CMAKE_COMMAND}" -E make_directory "${snx_meatboy_ui_dir}/gui"
+        COMMAND snx-uigen --out "${snx_meatboy_ui_dir}" "${CMAKE_CURRENT_SOURCE_DIR}/ui_meatboy.txt"
+        DEPENDS snx-uigen "${CMAKE_CURRENT_SOURCE_DIR}/ui_meatboy.txt"
+        COMMENT "Generating the Super Meat Boy launcher UI" VERBATIM)
+    add_library(snx_gui_ui_meatboy OBJECT "${snx_meatboy_ui_dir}/gui/ui.c")
+    target_include_directories(snx_gui_ui_meatboy PUBLIC "${snx_meatboy_ui_dir}")
+    target_link_libraries(snx_gui_ui_meatboy PRIVATE SDL3::SDL3)
+    set_target_properties(snx_gui_ui_meatboy PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED ON)
+    target_compile_options(snx_gui_ui_meatboy PRIVATE -Wall -Wextra -Werror=missing-prototypes)
+    set(snx_gui_ui_target snx_gui_ui_meatboy)
+endif()
 add_library(snx_gui_support STATIC aot.c model.c browser.c steps.c theme.c recent.c editor.c settings.c place.c clean.c
             queue.c latin.c wide.c log.c logzip.c gpu_driver.c gpu_driver_fetch.c covers.c probe.c last_run.c title.c
             ${gui_process}
@@ -105,6 +122,9 @@ else()
                 DESTINATION ${CMAKE_INSTALL_DATADIR}/applications COMPONENT desktop)
     endif()
 endif()
+if(SNX_GAME_SUPER_MEAT_BOY AND NOT ANDROID AND NOT IOS)
+    target_compile_definitions(scarletnx-gui PRIVATE SNX_MEATBOY=1)
+endif()
 if(APPLE)
     # the iOS and macOS frontend (docs/hosts/apple.md), as Android's is MainActivity and android.c: apple.m is the menu's
     # side, dist/apple/Frontend.swift the system's (iOS's document picker)
@@ -142,8 +162,8 @@ set_target_properties(scarletnx-gui PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED
     RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
 target_compile_options(scarletnx-gui PRIVATE -Wall -Wextra -Werror=missing-prototypes)
 target_compile_definitions(scarletnx-gui PRIVATE SNX_SOURCE_DIR="${PROJECT_SOURCE_DIR}" SNX_BUILD_DIR="${PROJECT_BINARY_DIR}")
-target_link_libraries(scarletnx-gui PUBLIC snx_gui_support PRIVATE snx_gui_ui scarletnx-common SDL3::SDL3
-                      snx_window_icon snx_build_info snx_pad_sdl snx_gui_pad snx_splash snx_gui_languages snx_demangle)
+target_link_libraries(scarletnx-gui PUBLIC snx_gui_support PRIVATE ${snx_gui_ui_target} scarletnx-common SDL3::SDL3
+                      snx_window_icon ${snx_gui_build_info_target} snx_pad_sdl snx_gui_pad snx_splash snx_gui_languages snx_demangle)
 # GPU Drivers' Download Driver, where the build has OpenSSL (common/network/https.h)
 if(TARGET snx_https)
     target_link_libraries(scarletnx-gui PRIVATE snx_https)

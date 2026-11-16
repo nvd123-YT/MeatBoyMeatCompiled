@@ -45,9 +45,9 @@ jobs:
     runs-on: ubuntu-26.04
     timeout-minutes: 20
     env:
-      NIGHTLY_REPO: scarletnx/nightly
+      NIGHTLY_REPO: nvd123-YT/MeatBoyMeatCompiled
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      NIGHTLY_TOKEN: ${{ secrets.NIGHTLY_TOKEN }}
+      NIGHTLY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       DISCORD_WEBHOOK_RELEASES: ${{ secrets.DISCORD_WEBHOOK_RELEASES }}
     steps:
       # main's scripts, and its history and tags for the changes the notes list

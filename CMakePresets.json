@@ -273,7 +273,11 @@
       "name": "macos",
       "displayName": "macOS on Apple silicon, Xcode's Clang (docs/hosts/apple.md)",
       "inherits": "base",
-      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Darwin" },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
       "cacheVariables": {
         "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++",
@@ -287,7 +291,11 @@
       "name": "ios",
       "displayName": "iOS, cross-built on a Mac with Xcode (docs/hosts/apple.md); LLVM_DIR names scripts/apple-llvm.sh's",
       "inherits": "base",
-      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Darwin" },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
       "cacheVariables": {
         "CMAKE_SYSTEM_NAME": "iOS",
         "CMAKE_SYSTEM_PROCESSOR": "arm64",
@@ -313,6 +321,40 @@
       "cacheVariables": {
         "CMAKE_OSX_SYSROOT": "iphonesimulator",
         "CMAKE_Swift_COMPILER_TARGET": "arm64-apple-ios16.0-simulator"
+      }
+    },
+    {
+      "name": "meatboy",
+      "displayName": "Super Meat Boy (Switch only)",
+      "description": "Build the Switch/NX runtime and desktop launcher. Disable unrelated 3DS, PS Vita, GBA, DS, Linux AArch64 guest and Android drivers.",
+      "inherits": "default",
+      "cacheVariables": {
+        "SNX_BUILD_NX": "ON",
+        "SNX_BUILD_GNUABI": "OFF",
+        "SNX_BUILD_3DS": "OFF",
+        "SNX_BUILD_VITA": "OFF",
+        "SNX_BUILD_AGB": "OFF",
+        "SNX_BUILD_NDS": "OFF",
+        "SNX_BUILD_ANDROID": "OFF",
+        "SNX_BUILD_GUI": "ON",
+        "SNX_GAME_SUPER_MEAT_BOY": "ON"
+      }
+    },
+    {
+      "name": "meatboy-macos",
+      "displayName": "Super Meat Boy (Switch only, macOS)",
+      "description": "Apple-silicon macOS build of the Switch/NX runtime and desktop launcher only.",
+      "inherits": "macos",
+      "cacheVariables": {
+        "SNX_BUILD_NX": "ON",
+        "SNX_BUILD_GNUABI": "OFF",
+        "SNX_BUILD_3DS": "OFF",
+        "SNX_BUILD_VITA": "OFF",
+        "SNX_BUILD_AGB": "OFF",
+        "SNX_BUILD_NDS": "OFF",
+        "SNX_BUILD_ANDROID": "OFF",
+        "SNX_BUILD_GUI": "ON",
+        "SNX_GAME_SUPER_MEAT_BOY": "ON"
       }
     }
   ],
@@ -384,6 +426,16 @@
     {
       "name": "ios-simulator",
       "configurePreset": "ios-simulator"
+    },
+    {
+      "name": "meatboy",
+      "configurePreset": "meatboy",
+      "displayName": "Build Super Meat Boy (Switch runtime)"
+    },
+    {
+      "name": "meatboy-macos",
+      "configurePreset": "meatboy-macos",
+      "displayName": "Build Super Meat Boy (macOS)"
     }
   ],
   "testPresets": [

@@ -59,12 +59,26 @@ fi
 # The runtime stays the AppImage's program (the desktop entry's Exec), so a copy named after a game runs that game.
 # Started bare it opens its launcher, which runs Switch games with it and the other drivers from beside it
 # (scarletnx-3ds, scarletnx-vita, scarletnx-agb, scarletnx-nds, scarletnx-gnuabi). The Linux runtime alone has no launcher.
+# Bundle the main program and only the driver aliases this build actually installed. A game-specific
+# build intentionally leaves unrelated drivers (3DS, Vita, AGB, DS, GNU ABI) out.
+programs=("$bin/scarletnx")
+drivers=()
 if [ "$main" = scarletnx ]; then
-    quick-sharun "$bin/scarletnx" "$bin/scarletnx-switch" "$bin/scarletnx-3ds" "$bin/scarletnx-vita" \
-        "$bin/scarletnx-agb" "$bin/scarletnx-nds" "$bin/scarletnx-gnuabi"
+    for program in scarletnx-switch scarletnx-3ds scarletnx-vita scarletnx-agb scarletnx-nds scarletnx-gnuabi; do
+        if [ -e "$bin/$program" ]; then
+            programs+=("$bin/$program")
+            drivers+=("$program")
+        fi
+    done
 else
-    quick-sharun "$bin/scarletnx" "$bin/scarletnx-gnuabi"
+    programs+=("$bin/scarletnx-gnuabi")
+    drivers+=(scarletnx-gnuabi)
 fi
+if [ ! -x "$bin/scarletnx" ]; then
+    echo "The installed ScarletNX runtime is missing: $bin/scarletnx" >&2
+    exit 1
+fi
+quick-sharun "${programs[@]}"
 
 # The licenses travel with the AppImage: the runtime's and those of the libraries built into it (`cmake --install` put
 # them in /usr/share/licenses/scarletnx), and those of the Arch packages quick-sharun took the bundled libraries from,
@@ -75,16 +89,22 @@ if [ ! -d "$appdir/lib" ]; then
     exit 1
 fi
 # each driver the launcher runs, a name of scarletnx's (SNX_MULTICALL): sharun has to start it under its own name
-if [ "$main" = scarletnx ]; then
-    for program in scarletnx-3ds scarletnx-vita scarletnx-agb scarletnx-nds scarletnx-gnuabi; do
-        out=$("$appdir/bin/$program" --help 2>&1 || true)
-        if ! grep -q "^Usage: $program" <<<"$out"; then
-            echo "The AppDir's bin/$program --help is not $program's. It printed:" >&2
+for program in "${drivers[@]}"; do
+    out=$("$appdir/bin/$program" --help 2>&1 || true)
+    # The Switch driver's shared usage banner is intentionally "scarletnx", not the alias
+    # "scarletnx-switch". Its Switch options identify the driver; other aliases name themselves.
+    if [ "$program" = scarletnx-switch ]; then
+        if ! grep -q '^Usage: scarletnx ' <<<"$out" || ! grep -q '^Switch options:' <<<"$out"; then
+            echo "The AppDir's bin/$program --help does not identify the Switch driver. It printed:" >&2
             echo "$out" >&2
             exit 1
         fi
-    done
-fi
+    elif ! grep -q "^Usage: $program" <<<"$out"; then
+        echo "The AppDir's bin/$program --help does not identify the expected driver. It printed:" >&2
+        echo "$out" >&2
+        exit 1
+    fi
+done
 if [ "$(head -c 8 "$appdir/.DirIcon" | od -An -tx1 | tr -d ' \n')" != 89504e470d0a1a0a ]; then
     echo "$appdir/.DirIcon is not a PNG: quick-sharun no longer takes ICON for it" >&2
     exit 1

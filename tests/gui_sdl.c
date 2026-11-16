@@ -11112,7 +11112,8 @@ int main(int argc, char** argv) {
             y = m.place.tabs.y + m.place.tabs.h / 2;
         }
         was = pixel(&app, (float)x, (float)y);
-        assert(same_colour(was, rgb(app.theme.focus))); /* settled: no shade left on it */
+        /* The SDL software renderer can round a blended edge by a couple of RGB units on ARM hosts. */
+        assert(near_colour(was, rgb(app.theme.focus), 2)); /* settled: no shade left on it */
         key(&app, SDLK_ESCAPE); /* Exit? over the menu: its shade comes in */
         assert(app.confirm.shown && app.confirm.ask == GUI_ASK_EXIT);
         render(&app);
